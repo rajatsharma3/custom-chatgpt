@@ -8,7 +8,7 @@ config();
 
 export const addDocument = async (req, res) => {
   try {
-    const loader = new PDFLoader("custom-chatgpt/BVICAM.pdf");
+    const loader = new PDFLoader("custom-chatgpt/drapcodeintro.pdf");
 
     const docs = await loader.load();
 

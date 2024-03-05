@@ -11,11 +11,11 @@ export const getAns = async (req, res) => {
     const pc = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY,
     });
-    const pineconeIndex = pc.index("testing");
+    const pineconeIndex = pc.index("custom-chatbot");
 
     const vectorStore = await PineconeStore.fromExistingIndex(
       new OpenAIEmbeddings(),
-      { pineconeIndex }
+      { pineconeIndex, namespace: "drapcode" }
     );
 
     const model = new OpenAI({ temperature: 0.6 });
@@ -27,7 +27,7 @@ export const getAns = async (req, res) => {
     });
 
     const result = await chain.invoke({
-      query: "tell me something about imaginepay",
+      query: "tell me something about drapcode",
     });
 
     console.log(result.text);
