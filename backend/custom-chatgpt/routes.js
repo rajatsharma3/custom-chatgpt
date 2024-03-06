@@ -1,22 +1,25 @@
 import { Router } from "express";
-import { addDocument } from "./addDocument.js";
-import { getAns } from "./retriveData.js";
-import { createNamespace } from "./createNamespace.js";
 import { supabaseGet, supabasePost } from "./supabase.js";
-import { malvisPost } from "./milvus.js";
+import { malvisPost, malvisGet } from "./milvus.js";
+import { pineconeGet, pineconePost } from "./pinecone.js";
+import { faissGet, faissPost } from "./faiss.js";
 
 const appRoute = new Router();
 
 //pinecone routes
-appRoute.get("/adddocument", addDocument);
-appRoute.get("/getans", getAns);
-appRoute.get("/createnamespace", createNamespace);
+appRoute.get("/pineconepost", pineconePost);
+appRoute.get("/pineconeget", pineconeGet);
 
 //supabase routes
 appRoute.get("/supabasepost", supabasePost);
 appRoute.get("/supabaseget", supabaseGet);
 
 //malvis routes
-appRoute.get("/malvispost", malvisPost);
+appRoute.get("/milvuspost", malvisPost);
+appRoute.get("/milvusget", malvisGet);
+
+//faiss routes
+appRoute.get("/faisspost", faissPost);
+appRoute.get("/faissget", faissGet);
 
 export default appRoute;
