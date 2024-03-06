@@ -66,11 +66,6 @@ export const pineconePost = async (req, res) => {
 
 export const pineconeGet = async (req, res) => {
   try {
-    const pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY,
-    });
-    const pineconeIndex = pc.index("custom-chatbot");
-
     const vectorStore = await PineconeStore.fromExistingIndex(
       new OpenAIEmbeddings(),
       { pineconeIndex, namespace: "drapcode" }
