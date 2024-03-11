@@ -3,9 +3,15 @@ import { supabaseGet, supabasePost } from "./supabase.js";
 import { malvisPost, malvisGet } from "./milvus.js";
 import { pineconeGet, pineconePost } from "./pinecone.js";
 import { faissGet, faissPost } from "./faiss.js";
-// import { testing } from "./openaiFunction.js";
+import get_response from "./openaiFunction.js";
+import { upload } from "./middleware/uploadfile.js";
 
 const appRoute = new Router();
+
+//upload a file
+appRoute.post("/upload", upload.single("file"), (req, res) => {
+  res.json({ message: "File uploaded successfully" });
+});
 
 // //pinecone routes
 // appRoute.get("/pineconepost", pineconePost);
@@ -23,7 +29,7 @@ const appRoute = new Router();
 // appRoute.get("/faisspost", faissPost);
 // appRoute.get("/faissget", faissGet);
 
-//testing routes
-// appRoute.get("/testing", testing);
+//response routes
+appRoute.get("/getresponse", get_response);
 
 export default appRoute;

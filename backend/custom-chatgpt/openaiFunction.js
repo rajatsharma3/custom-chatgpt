@@ -21,7 +21,10 @@ async function get_knowledge_base_results(query = "Hello") {
   return JSON.stringify({ answer: answer });
 }
 
-async function run_conversation() {
+async function get_response(req, res) {
+  console.log("Req->>", req.query.question);
+  const user_question = req.query.question;
+
   const baseURL = "https://api.openai.com/v1/chat/completions";
   const headers = {
     "Content-Type": "application/json",
@@ -38,7 +41,7 @@ async function run_conversation() {
         role: "system",
         content: `If the user has asked any question and you don't have any answer to it then call the function get_knowledge_base_results with the user's question as the query parameter. Example call: get_knowledge_base_results(query='Whatever user's question is') This function will give you the relevant results from the knowledge base. You can use these results to answer the user's question.`,
       },
-      { role: "user", content: "tell me something about google" },
+      { role: "user", content: `${user_question}` },
     ],
     model: "gpt-3.5-turbo-0613",
     functions: [
@@ -75,16 +78,13 @@ async function run_conversation() {
       }
       let function_response = "";
 
-      switch (function_name) {
-        case "get_knowledge_base_results":
-          let knowledgebaseArgs = JSON.parse(message.function_call.arguments);
-          function_response = await get_knowledge_base_results(
-            knowledgebaseArgs.query
-          );
-          break;
-
-        default:
-          throw new Error(`Unsupported function: ${function_name}`);
+      if (function_name === "get_knowledge_base_results") {
+        let knowledgebaseArgs = JSON.parse(message.function_call.arguments);
+        function_response = await get_knowledge_base_results(
+          knowledgebaseArgs.query
+        );
+      } else {
+        throw new Error(`Unsupported function: ${function_name}`);
       }
 
       console.log("Function response==>", function_response);
@@ -103,15 +103,15 @@ async function run_conversation() {
     }
     response = await axios.post(baseURL, data, { headers });
     response = response.data;
-    return response;
+    let answer = "";
+    if (response.choices[0]) {
+      answer = response.choices[0].message.content;
+    }
+    res.send(answer);
   } catch (error) {
+    res.send(error);
     console.error("Error:", error);
   }
 }
-run_conversation()
-  .then((response) => {
-    console.log(response.choices[0].message.content);
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-  });
+
+export default get_response;
