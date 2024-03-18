@@ -1,4 +1,3 @@
-// 1. Importing axios for making HTTP requests and dotenv for managing environment variables.
 import axios from "axios";
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -43,7 +42,7 @@ async function get_response(req, res) {
       },
       { role: "user", content: `${user_question}` },
     ],
-    model: "gpt-3.5-turbo-0613",
+    model: "gpt-3.5-turbo-0125",
     functions: [
       {
         name: "get_knowledge_base_results",
@@ -66,11 +65,15 @@ async function get_response(req, res) {
     console.log(`Sending initial request to OpenAI API...`);
     let response = await axios.post(baseURL, data, { headers });
     response = response.data;
+    console.log("response---->", response);
     let executedFunctions = {};
     while (
       response.choices[0].message.function_call &&
       response.choices[0].finish_reason !== "stop"
     ) {
+      console.log("function_call->", response.choices[0].message.function_call);
+      console.log("finish_reason", response.choices[0].finish_reason);
+
       let message = response.choices[0].message;
       const function_name = message.function_call.name;
       if (executedFunctions[function_name]) {
@@ -96,7 +99,8 @@ async function get_response(req, res) {
         content: function_response,
       });
       console.log(
-        `Sending request to OpenAI with ${function_name} response...`
+        `Sending request to OpenAI with ${function_name} response...`,
+        data.messages
       );
       response = await axios.post(baseURL, data, { headers });
       response = response.data;
